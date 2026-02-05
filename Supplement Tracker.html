@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dissertation Supplement Tracker</title>
+    <style>
+        :root {
+            --color-bg-base: #0f172a;
+            --color-bg-elevated: #020617;
+            --color-bg-surface: #1e293b;
+            --color-bg-muted: #334155;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-text-muted: #94a3b8;
+            --color-text-accent: #38bdf8;
+            --color-primary: #38bdf8;
+            --color-primary-hover: #0ea5e9;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --color-bg-base: #ffffff;
+                --color-bg-elevated: #f8fafc;
+                --color-bg-surface: #f1f5f9;
+                --color-bg-muted: #e2e8f0;
+                --color-text-primary: #0f172a;
+                --color-text-secondary: #475569;
+                --color-text-muted: #64748b;
+                --color-text-accent: #0284c7;
+                --color-primary: #0284c7;
+                --color-primary-hover: #0369a1;
+                --color-success: #059669;
+                --color-warning: #d97706;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-bg-base);
+            color: var(--color-text-primary);
+            padding: 20px;
+            padding-bottom: 100px;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--color-bg-surface);
+            border-radius: 16px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--color-primary);
+        }
+
+        .header p {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .phase-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--color-bg-surface);
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .phase-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .phase-btn.active {
+            background: var(--color-primary);
+            color: var(--color-bg-base);
+        }
+
+        .time-block {
+            background: var(--color-bg-surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .time-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .time-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .time-range {
+            font-size: 14px;
+            color: var(--color-text-muted);
+        }
+
+        .supplement-item {
+            background: var(--color-bg-muted);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .supplement-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--color-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .checkbox.checked {
+            background: var(--color-primary);
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: var(--color-bg-base);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .supplement-content {
+            flex: 1;
+        }
+
+        .supplement-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: var(--color-text-primary);
+        }
+
+        .supplement-dose {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .supplement-note {
+            font-size: 13px;
+            color: var(--color-text-muted);
+            font-style: italic;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            color: var(--color-primary);
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .progress-bar {
+            background: var(--color-bg-surface);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .progress-track {
+            background: var(--color-bg-muted);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--color-bg-surface);
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--color-text-muted);
+            cursor: pointer;
+        }
+
+        .modal-body h3 {
+            color: var(--color-primary);
+            font-size: 16px;
+            margin: 16px 0 8px 0;
+        }
+
+        .modal-body p, .modal-body ul {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .modal-body ul {
+            margin-left: 20px;
+        }
+
+        .modal-body li {
+            margin-bottom: 6px;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border: 2px solid var(--color-primary);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: var(--color-primary);
+            color: var(--color-bg-base);
+        }
+
+        .calendar-section, .hydration-section, .synergy-section {
+            background: var(--color-bg-surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin: 0;
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: var(--color-bg-muted);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            color: var(--color-text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: var(--color-primary);
+        }
+
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .calendar-day.header {
+            color: var(--color-text-muted);
+            font-size: 12px;
+            cursor: default;
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--color-primary);
+        }
+
+        .calendar-day.complete {
+            background: var(--color-success);
+            color: white;
+        }
+
+        .calendar-day.partial {
+            background: var(--color-warning);
+            color: white;
+        }
+
+        .calendar-day.none {
+            background: var(--color-bg-muted);
+            color: var(--color-text-secondary);
+        }
+
+        .calendar-day.future {
+            background: var(--color-bg-elevated);
+            color: var(--color-text-muted);
+            cursor: default;
+        }
+
+        .calendar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.complete {
+            background: var(--color-success);
+        }
+
+        .legend-dot.partial {
+            background: var(--color-warning);
+        }
+
+        .legend-dot.none {
+            background: var(--color-bg-muted);
+        }
+
+        .hydration-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .hydration-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: var(--color-primary);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .hydration-btn:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .hydration-btn.reset-hydration {
+            background: var(--color-bg-muted);
+            color: var(--color-text-primary);
+        }
+
+        .hydration-bar {
+            background: var(--color-bg-muted);
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .hydration-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .hydration-tips {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tip-item {
+            background: var(--color-bg-elevated);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            line-height: 1.4;
+        }
+
+        .synergy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .synergy-card {
+            background: var(--color-bg-muted);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .synergy-card h3 {
+            font-size: 16px;
+            color: var(--color-primary);
+            margin-bottom: 12px;
+        }
+
+        .synergy-card p {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .synergy-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .synergy-card strong {
+            color: var(--color-text-primary);
+        }
+
+        .phase-info {
+            background: var(--color-bg-elevated);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .phase-info h3 {
+            color: var(--color-primary);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .phase-info p {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge.loading {
+            background: var(--color-warning);
+            color: var(--color-bg-base);
+        }
+
+        .badge.maintenance {
+            background: var(--color-success);
+            color: var(--color-bg-base);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                padding-bottom: 80px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .time-title {
+                font-size: 18px;
+            }
+
+            .synergy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hydration-controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .calendar-grid {
+                gap: 4px;
+            }
+
+            .calendar-day {
+                font-size: 12px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .section-header h2 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💊 Supplement Plan</h1>
+        <p>Optimale Nährstoffversorgung für kognitive Leistung</p>
+    </div>
+
+    <div class="phase-selector">
+        <button class="phase-btn active" onclick="switchPhase('phase1')">Phase 1 (Wo. 1-7)</button>
+        <button class="phase-btn" onclick="switchPhase('phase2')">Phase 2 (ab Wo. 8)</button>
+    </div>
+
+    <div class="phase-info" id="phaseInfo">
+        <h3>Phase 1: Aufladephase <span class="badge loading">Loading</span></h3>
+        <p>Wochen 1-7: Kreatin-Aufladung mit 5g täglich. Nach 7 Tagen sind deine Kreatinspeicher maximal gefüllt.</p>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-label">
+            <span>Heutiger Fortschritt</span>
+            <span id="progressText">0/11 (0%)</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetDay()">🔄 Tag zurücksetzen</button>
+
+    <div class="hydration-section">
+        <div class="section-header">
+            <h2>💧 Flüssigkeitsaufnahme</h2>
+            <span id="hydrationTotal">0 / 3000 ml</span>
+        </div>
+        <div class="hydration-controls">
+            <button class="hydration-btn" onclick="addWater(250)">+ 250ml</button>
+            <button class="hydration-btn" onclick="addWater(500)">+ 500ml</button>
+            <button class="hydration-btn" onclick="addWater(750)">+ 750ml</button>
+            <button class="hydration-btn reset-hydration" onclick="resetWater()">↺ Reset</button>
+        </div>
+        <div class="hydration-bar">
+            <div class="hydration-fill" id="hydrationFill"></div>
+        </div>
+        <div class="hydration-tips">
+            <div class="tip-item">💡 <strong>Empfehlung:</strong> 2500-3500ml täglich</div>
+            <div class="tip-item">⚡ <strong>Bei Kreatin:</strong> +500ml extra zur Einnahme</div>
+        </div>
+    </div>
+
+    <div class="synergy-section">
+        <div class="section-header">
+            <h2>🔄 Einnahme-Synergien & Tipps</h2>
+        </div>
+        <div class="synergy-grid">
+            <div class="synergy-card">
+                <h3>☕ L-Theanin + Kaffee</h3>
+                <p><strong>Timing:</strong> L-Theanin um 7:00, Kaffee 30-60 Min später (8:00-9:00)</p>
+                <p><strong>Dosis:</strong> 100mg L-Theanin + 1-2 Tassen Kaffee (ca. 100-200mg Koffein)</p>
+                <p><strong>Effekt:</strong> Perfekte Kombination für Fokus ohne Nervosität. L-Theanin reduziert Koffein-Jitter.</p>
+            </div>
+            
+            <div class="synergy-card">
+                <h3>🥤 Kreatin + Orangensaft</h3>
+                <p><strong>Timing:</strong> Mittags (12:00-13:00)</p>
+                <p><strong>Dosis:</strong> 3-5g Kreatin in 200ml Orangensaft oder Apfelsaft</p>
+                <p><strong>Effekt:</strong> Einfache Kohlenhydrate + Insulin-Spike verbessern Kreatin-Absorption um ~60%</p>
+            </div>
+            
+            <div class="synergy-card">
+                <h3>🥑 Omega-3 + D3/K2 + Fett</h3>
+                <p><strong>Timing:</strong> Morgens mit Frühstück</p>
+                <p><strong>Dosis:</strong> Mit mind. 10-15g Nahrungsfett (z.B. Avocado, Nüsse, Eier, Olivenöl)</p>
+                <p><strong>Effekt:</strong> Fettlösliche Vitamine brauchen Nahrungsfett für 3-5x bessere Aufnahme</p>
+            </div>
+            
+            <div class="synergy-card">
+                <h3>🍚 Kreatin + Mittagessen</h3>
+                <p><strong>Timing:</strong> Während oder direkt nach Mittagessen</p>
+                <p><strong>Dosis:</strong> Mit Kohlenhydraten (50-100g) + Protein (20-30g)</p>
+                <p><strong>Effekt:</strong> Optimale Muskel- und Gehirn-Einlagerung durch Insulin-Response</p>
+            </div>
+            
+            <div class="synergy-card">
+                <h3>💧 Wasser-Verteilung</h3>
+                <p><strong>Morgens (7:00):</strong> 500ml mit Supplements</p>
+                <p><strong>Vormittag:</strong> 750ml (bis 12:00)</p>
+                <p><strong>Mittags (12:00):</strong> 500ml + 500ml extra bei Kreatin = 1000ml</p>
+                <p><strong>Nachmittag:</strong> 750ml (bis 18:00)</p>
+                <p><strong>Abend:</strong> 500ml (bis 22:00)</p>
+                <p><strong>GESAMT:</strong> 3000-3500ml</p>
+            </div>
+            
+            <div class="synergy-card">
+                <h3>⚠️ Koffein-Limit</h3>
+                <p><strong>Timing:</strong> Kein Kaffee nach 14:00 Uhr</p>
+                <p><strong>Grund:</strong> Interferiert mit Entspannung und kann Magnesium-Aufnahme stören</p>
+                <p><strong>Alternative:</strong> Grüner Tee (weniger Koffein, L-Theanin enthalten)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="time-block">
+        <div class="time-header">
+            <div class="time-title">🌅 Morgens</div>
+            <div class="time-range">7:00-8:00 Uhr</div>
+        </div>
+        
+        <div class="supplement-item" data-supplement="omega3">
+            <div class="checkbox" onclick="toggleCheck(this)"></div>
+            <div class="supplement-content">
+                <div class="supplement-name">Omega-3 (Topfruits)</div>
+                <div class="supplement-dose">2 Kapseln</div>
+                <div class="supplement-note">Mit Frühstück + Fett für optimale Aufnahme</div>
+            </div>
+            <div class="info-icon" onclick="showInfo('omega3')">ⓘ</div>
+        </div>
+
+        <div class="supplement-item" data-supplement="d3k2">
+            <div class="checkbox" onclick="toggleCheck(this)"></div>
+            <div class="supplement-content">
+                <div class="supplement-name">Vitamin D3 + K2 (Sunday)</div>
+                <div class="supplement-dose">1 Tablette (5000 IE + 100µg)</div>
+                <div class="supplement-note">Mit Frühstück + Fett, täglich statt alle 5 Tage</div>
+            </div>
+            <div class="info-icon" onclick="showInfo('d3k2')">ⓘ</div>
+        </div>
+
+        <div class="supplement-item" data-supplement="bcomplex">
+            <div class="checkbox" onclick="toggleCheck(this)"></div>
+            <div class="supplement-content">
+                <div class="supplement-name">B-Komplex Bioaktiv (Sunday)</div>
+                <div class="supplement-dose">1 Kapsel</div>
+                <div class="supplement-note">Alle 8 B-Vitamine + 4 Kofaktoren</div>
+            </div>
+            <div class="info-icon" onclick="showInfo('bcomplex')">ⓘ</div>
+        </div>
+
+        <div class="supplement-item" data-supplement="theanin">
+            <div class="checkbox" onclick="toggleCheck(this)"></div>
+            <div class="supplement-content">
+                <div class="supplement-name">L-Theanin (Sunday)</div>
+                <div class="supplement-dose">1 Kapsel (100mg)</div>
+                <div class="supplement-note">Fokus ohne Nervosität, ideal vor Kaffee</div>
+            </div>
+            <div class="info-icon" onclick="showInfo('theanin')">ⓘ</div>
+        </div>
+    </div>
+
+    <div class="time-block">
+        <div class="time-header">
+            <div class="time-title">☀️ Mittags</div>
+            <div class="time-range">12:00-13:00 Uhr</div>
+        </div>
+
+        <div class="supplement-item" data-supplement="brahmi">
+            <div class="checkbox" onclick="toggleCheck(this)"></div>
+            <div class="supplement-content">
+                <div class="supplement-name">Brahmi/Bacopa (Sunday)</div>
+                <div class="supplement-dose">1 Kapsel (500mg = 100mg Bacoside)</div>
+                <div class="supplement-note">Verbales Lernen + Gedächtnisretention</div>
+            </div>
+            <div class="info-icon" onclick="showInfo('brahmi')">ⓘ</div>
+        </div>
+
+        <div class="supplement-item phase1-only" data-supplement="creatine-loading">
+            <div class="checkbox" onclick="toggleCheck(this)"></div>
+            <div class="supplement-content">
+                <div class="supplement-name">Kreatin Monohydrat (Bodylab24)</div>
+                <div class="supplement-dose">5g Pulver (1 Messlöffel)</div>
+                <div class="supplement-note">Aufladephase: In Wasser/Saft, mit Mittagessen</div>
+            </div>
+            <div class="info-icon" onclick="showInfo('creatine')">ⓘ</div>
+        </div>
+
+        <div class="supplement-item phase2-only" data-supplement="creatine-maintenance" style="display: none;">
+            <div class="checkbox" onclick="toggleCheck(this)"></div>
+            <div class="supplement-content">
+                <div class="supplement-name">Kreatin Monohydrat (Bodylab24)</div>
+                <div class="supplement-dose">3g Pulver</div>
+                <div class="supplement-note">Erhaltung: In Wasser/Saft, mit Mittagessen</div>
+            </div>
+            <div class="info-icon" onclick="showInfo('creatine')">ⓘ</div>
+        </div>
+    </div>
+
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle"></div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentPhase = 'phase1';
+        const supplementInfo = {
+            omega3: {
+                title: 'Omega-3 Fischöl (Topfruits)',
+                content: `
+                    <h3>Dosierung & Wirkung</h3>
+                    <p><strong>Dosis:</strong> 2 Kapseln täglich (ca. 1000mg EPA + 500mg DHA)</p>
+                    
+                    <h3>Wichtig für kognitive Leistung</h3>
+                    <ul>
+                        <li><strong>Neuroinflammation-Reduktion:</strong> Wichtig bei mentaler Belastung</li>
+                        <li><strong>Gehirn-Durchblutung:</strong> Verbessert Konzentration und Fluidität</li>
+                        <li><strong>Neuroprotektiv:</strong> Schutz gegen oxidativen Stress</li>
+                    </ul>
+                    
+                    <h3>Einnahme-Tipps</h3>
+                    <p>Mit Frühstück + Fett für optimale Absorption. Fettlösliche Omega-3-Fettsäuren brauchen Nahrungsfett zur Aufnahme.</p>
+                    
+                    <h3>Lagerung</h3>
+                    <p>Nach Öffnung im Kühlschrank lagern für maximale Haltbarkeit (12-24 Monate).</p>
+                `
+            },
+            d3k2: {
+                title: 'Vitamin D3 5000 IE + K2 100µg (Sunday)',
+                content: `
+                    <h3>Dosierung & Wirkung</h3>
+                    <p><strong>Dosis:</strong> 1 Tablette täglich (statt alle 5 Tage wie vom Hersteller angegeben)</p>
+                    <p>5000 IE D3 + 100µg K2 MK7 all-trans (99,7% Reinheit)</p>
+                    
+                    <h3>Wichtig für kognitive Leistung</h3>
+                    <ul>
+                        <li><strong>Immunfunktion:</strong> Besonders wichtig in Wintermonaten</li>
+                        <li><strong>Neuromodulation:</strong> Serotonin-Synthese für Stimmung</li>
+                        <li><strong>Knochendichte:</strong> Wichtig bei sitzender Tätigkeit</li>
+                        <li><strong>K2-Synergie:</strong> Optimale Calcium-Verwertung</li>
+                    </ul>
+                    
+                    <h3>Einnahme-Tipps</h3>
+                    <p>Mit Frühstück + Fett. Fettlösliche Vitamine D3 und K2 benötigen Nahrungsfett. Mit MCT-Öl aus Kokos für bessere Aufnahme.</p>
+                    
+                    <h3>Sicherheit</h3>
+                    <p>5000 IE liegt minimal über BfR-Obergrenze (4000 IE), ist aber therapeutisch sicher für optimale Winter-Versorgung.</p>
+                `
+            },
+            bcomplex: {
+                title: 'B-Komplex Bioaktiv Forte (Sunday)',
+                content: `
+                    <h3>Alle 8 B-Vitamine + 4 Kofaktoren</h3>
+                    <p><strong>Bioaktive Formen:</strong> B1, B2 (R-5-P), B3, B5, B6 (P-5-P), B7 (Biotin), B9 (L-Methylfolat), B12 (MH3A®-Formel)</p>
+                    
+                    <h3>Wichtig für Doktoranden</h3>
+                    <ul>
+                        <li><strong>Energiestoffwechsel:</strong> B1, B2, B3, B5 für Mitochondrien</li>
+                        <li><strong>Nervensystem:</strong> B6, B12, Folat für Neurotransmitter (Serotonin, Dopamin)</li>
+                        <li><strong>Psychische Gesundheit:</strong> B3, B6, B12 reduzieren Stress und Angst</li>
+                        <li><strong>DNA-Reparatur:</strong> L-Methylfolat für Zellteilung nach intensivem Denken</li>
+                    </ul>
+                    
+                    <h3>Besonderheit: Bioaktive Formen</h3>
+                    <p><strong>L-Methylfolat (Quatrefolic® + Magnafolate® Pro):</strong> Direkt aktiv, keine Umwandlung nötig. Bei Stress oder MTHFR-Genvarianten (30-40% der Bevölkerung) funktioniert synthetische Folsäure nicht optimal.</p>
+                    
+                    <p><strong>B12 MH3A®-Formel:</strong> Alle 3 natürlichen Formen (Methylcobalamin, Hydroxocobalamin, Adenosylcobalamin) in einem Präparat.</p>
+                    
+                    <h3>Kofaktoren</h3>
+                    <p>Citicolin, Betain, Inositol, NADH – verstärken B-Vitamin-Wirkung optimal.</p>
+                `
+            },
+            theanin: {
+                title: 'L-Theanin 100mg (Sunday)',
+                content: `
+                    <h3>Dosierung & Wirkung</h3>
+                    <p><strong>Dosis:</strong> 1 Kapsel (100mg) aus pestizidfreiem Grüntee-Extrakt</p>
+                    
+                    <h3>Wichtig für kognitive Leistung</h3>
+                    <ul>
+                        <li><strong>Fokus ohne Stimulation:</strong> Perfekt mit Kaffee kombiniert</li>
+                        <li><strong>Alpha-Wellen:</strong> Entspannte Wachheit, nicht Schläfrigkeit</li>
+                        <li><strong>Stress-Reduktion:</strong> GABA-Aktivierung ohne Benzodiazepine</li>
+                        <li><strong>Synergie mit Bacopa:</strong> Additive Wirkung auf verschiedene Pfade</li>
+                    </ul>
+                    
+                    <h3>Perfekte Kombination mit Kaffee</h3>
+                    <p>Morgens: L-Theanin (7:00) + Kaffee (8:00-9:00) = perfekte Kombination für Fokus ohne Jitter. L-Theanin reduziert Anxiety des Koffeins, verstärkt Fokus.</p>
+                    
+                    <h3>Zeitpunkt</h3>
+                    <p>Morgens ideal. Nicht abends, da nicht schlaffördernd.</p>
+                `
+            },
+            brahmi: {
+                title: 'Brahmi/Bacopa Extrakt (Sunday)',
+                content: `
+                    <h3>Dosierung & Wirkung</h3>
+                    <p><strong>Dosis:</strong> 1 Kapsel (500mg Extrakt × 20% = 100mg Bacoside)</p>
+                    
+                    <h3>Wichtig für kognitive Leistung</h3>
+                    <ul>
+                        <li><strong>Verbales Lernen:</strong> Speziell für komplexe Texte und Konzepte</li>
+                        <li><strong>Gedächtnisretention:</strong> Besseres Behalten komplexer Inhalte</li>
+                        <li><strong>Lerngeschwindigkeit:</strong> Verkürzt "Time to Learn" neuer Konzepte</li>
+                        <li><strong>Stressabbau:</strong> Sekundärer anti-Angst-Effekt (anxiolytisch)</li>
+                        <li><strong>Neuroplastizität:</strong> Fördert Nervenzell-Regeneration</li>
+                    </ul>
+                    
+                    <h3>Wichtig: Einnahmedauer</h3>
+                    <p><strong>Mindestens 6-12 Wochen für spürbare Effekte!</strong> Kontinuierliche Einnahme wichtig für optimale Wirkung.</p>
+                    
+                    <h3>Warum besser als Ginkgo?</h3>
+                    <p>Bacopa wirkt auf neuronale Kommunikation (du musst LERNEN). Ginkgo wirkt auf Durchblutung (wichtiger für ältere Menschen mit kognitiver Verschlechterung).</p>
+                `
+            },
+            creatine: {
+                title: 'Kreatin Monohydrat (Bodylab24)',
+                content: `
+                    <h3>Phase 1 (Wochen 1-7): Aufladung</h3>
+                    <p><strong>Dosis:</strong> 5g täglich (1 Messlöffel)</p>
+                    <p>Nach 7 Tagen sind Kreatinspeicher maximal gefüllt.</p>
+                    
+                    <h3>Phase 2 (ab Woche 8): Erhaltung</h3>
+                    <p><strong>Dosis:</strong> 3g täglich</p>
+                    <p>Alternative: 2-3× pro Woche 5g (flexible Variante)</p>
+                    
+                    <h3>Nicht nur für Muskeln!</h3>
+                    <ul>
+                        <li><strong>Gehirn-Energie:</strong> Das Gehirn hat ENORME Energie-Anforderungen</li>
+                        <li><strong>ATP-Regeneration:</strong> Kreatin regeneriert ATP (Zell-Energie) 50× schneller</li>
+                        <li><strong>Kognitive Leistung:</strong> Bei Stress steigt Gehirn-Energie-Bedarf um 200-300%</li>
+                        <li><strong>Langfristige Speicherung:</strong> In Gehirn + Muskeln</li>
+                    </ul>
+                    
+                    <h3>Warum Loading-Phase?</h3>
+                    <p>Mit 5g Loading bist du in 7 Tagen maximal versorgt. Mit nur 3g von Anfang an würdest du 3-4 Wochen warten, bis Speicher voll sind.</p>
+                    
+                    <h3>Einnahme-Tipp</h3>
+                    <p>Mix in 200ml Orangensaft oder Apfelsaft – verbessert Absorption durch einfache Kohlenhydrate und Insulin-Spike. Mit Mittagessen kombinieren.</p>
+                    
+                    <h3>Haltbarkeit</h3>
+                    <p>500g = ca. 146-167 Tage bei 3-5g täglich = ca. 5 Monate pro Beutel. Unbegrenzt haltbar wenn trocken gelagert. NICHT im Kühlschrank (Feuchtigkeitsaufnahme!).</p>
+                `
+            }
+        };
+
+        function loadProgress() {
+            const today = new Date().toDateString();
+            const savedDate = localStorage.getItem('supplementDate');
+            
+            if (savedDate !== today) {
+                localStorage.setItem('supplementDate', today);
+                localStorage.removeItem('checkedSupplements');
+                return [];
+            }
+            
+            const saved = localStorage.getItem('checkedSupplements');
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveProgress(checked) {
+            localStorage.setItem('checkedSupplements', JSON.stringify(checked));
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.supplement-item:not([style*="display: none"]) .checkbox');
+            const checked = Array.from(checkboxes).filter(cb => cb.classList.contains('checked')).length;
+            const total = checkboxes.length;
+            const percentage = Math.round((checked / total) * 100);
+            
+            document.getElementById('progressText').textContent = `${checked}/${total} (${percentage}%)`;
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+        }
+
+        function toggleCheck(checkbox) {
+            checkbox.classList.toggle('checked');
+            const item = checkbox.closest('.supplement-item');
+            const supplement = item.dataset.supplement;
+            
+            let checked = loadProgress();
+            if (checkbox.classList.contains('checked')) {
+                if (!checked.includes(supplement)) {
+                    checked.push(supplement);
+                }
+            } else {
+                checked = checked.filter(s => s !== supplement);
+            }
+            
+            saveProgress(checked);
+            updateProgress();
+        }
+
+        function resetDay() {
+            if (confirm('Möchtest du den heutigen Tag wirklich zurücksetzen?')) {
+                localStorage.removeItem('checkedSupplements');
+                document.querySelectorAll('.checkbox').forEach(cb => cb.classList.remove('checked'));
+                updateProgress();
+            }
+        }
+
+        function switchPhase(phase) {
+            currentPhase = phase;
+            
+            document.querySelectorAll('.phase-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const phase1Items = document.querySelectorAll('.phase1-only');
+            const phase2Items = document.querySelectorAll('.phase2-only');
+            
+            if (phase === 'phase1') {
+                phase1Items.forEach(item => item.style.display = 'flex');
+                phase2Items.forEach(item => item.style.display = 'none');
+                document.getElementById('phaseInfo').innerHTML = `
+                    <h3>Phase 1: Aufladephase <span class="badge loading">Loading</span></h3>
+                    <p>Wochen 1-7: Kreatin-Aufladung mit 5g täglich. Nach 7 Tagen sind deine Kreatinspeicher maximal gefüllt.</p>
+                `;
+            } else {
+                phase1Items.forEach(item => item.style.display = 'none');
+                phase2Items.forEach(item => item.style.display = 'flex');
+                document.getElementById('phaseInfo').innerHTML = `
+                    <h3>Phase 2: Erhaltungsphase <span class="badge maintenance">Erhaltung</span></h3>
+                    <p>Ab Woche 8: Kreatin-Erhaltung mit 3g täglich. Deine Speicher sind gefüllt, jetzt nur noch Erhaltung nötig.</p>
+                `;
+            }
+            
+            updateProgress();
+        }
+
+        function showInfo(supplement) {
+            const info = supplementInfo[supplement];
+            document.getElementById('modalTitle').textContent = info.title;
+            document.getElementById('modalBody').innerHTML = info.content;
+            document.getElementById('infoModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        function loadHydration() {
+            const today = new Date().toDateString();
+            const savedDate = localStorage.getItem('hydrationDate');
+            
+            if (savedDate !== today) {
+                localStorage.setItem('hydrationDate', today);
+                localStorage.setItem('hydrationAmount', '0');
+                return 0;
+            }
+            
+            return parseInt(localStorage.getItem('hydrationAmount') || '0');
+        }
+
+        function saveHydration(amount) {
+            localStorage.setItem('hydrationAmount', amount.toString());
+        }
+
+        function updateHydrationDisplay() {
+            const amount = loadHydration();
+            const target = 3000;
+            const percentage = Math.min((amount / target) * 100, 100);
+            
+            document.getElementById('hydrationTotal').textContent = `${amount} / ${target} ml`;
+            document.getElementById('hydrationFill').style.width = `${percentage}%`;
+        }
+
+        function addWater(amount) {
+            let current = loadHydration();
+            current += amount;
+            saveHydration(current);
+            updateHydrationDisplay();
+        }
+
+        function resetWater() {
+            if (confirm('Flüssigkeitsaufnahme für heute zurücksetzen?')) {
+                saveHydration(0);
+                updateHydrationDisplay();
+            }
+        }
+
+        window.onload = function() {
+            const checked = loadProgress();
+            checked.forEach(supplement => {
+                const item = document.querySelector(`[data-supplement="${supplement}"]`);
+                if (item) {
+                    const checkbox = item.querySelector('.checkbox');
+                    if (checkbox) checkbox.classList.add('checked');
+                }
+            });
+            updateProgress();
+            updateHydrationDisplay();
+        };
+    </script>
+</body>
+</html>
